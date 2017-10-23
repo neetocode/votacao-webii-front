@@ -16,7 +16,7 @@ class AcessarVotacao extends React.Component {
     }
 
     componentDidMount() {
-        axios.get(`${api}questionario`)
+        axios.get(`${api}votacao`)
             .then(r => {
                 r = r.data;
                 this.setState({ votacoes: r });
@@ -28,13 +28,13 @@ class AcessarVotacao extends React.Component {
 
         const { codigo } = this.state;
         this.setState({ buscado: false, encontrado: false });
-        axios.get(`${api}questionario/codigo/${codigo}`)
+        axios.get(`${api}votacao/codigo/${codigo}`)
             .then(r => {
                 r = r.data;
                 console.log(r);
                 if (r) {
                     this.setState({ buscado: true, encontrado: true });
-                    this.props.history.push('/questionario/' + codigo, { votacao: r });
+                    this.props.history.push('/votacao/' + codigo, { votacao: r });
 
                 } else {
                     this.setState({ buscado: true, encontrado: false });
@@ -84,7 +84,8 @@ class AcessarVotacao extends React.Component {
                                     {votacoes.map(votacao => (
                                         <List.Item key={votacao._id}>
                                             <List.Content>
-                                                <List.Header>{votacao.nome}</List.Header>
+                                                <List.Header>{votacao.titulo}</List.Header>
+                                                <p>{votacao.descricao}</p>
                                                 <Link to={`/votacao/${votacao._id}`}>Acessar</Link>
                                             </List.Content>
                                         </List.Item>

@@ -8,6 +8,7 @@ import AcessarVotacao from './components/AcessarVotacao';
 import NovaVotacao from './components/NovaVotacao';
 import Votacao from './components/Votacao';
 import 'semantic-ui-css/semantic.min.css';
+require('dotenv').config();
 
 class App extends React.Component{
 
