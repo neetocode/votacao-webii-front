@@ -1,54 +1,46 @@
 import React from 'react'
 import axios from 'axios'
-import { Container, Form, Button, Loader } from 'semantic-ui-react'
+import { Container, Form, Button, Loader, Rating } from 'semantic-ui-react'
 import { Link } from 'react-router-dom'
 import { api } from './../constantes'
 
-const conceitos = {
-    massa: 'massa',
-    legal: 'legal',
-    tentandoEntender: 'tentandoEntender',
-    puts: 'puts'
-}
 class Votacao extends React.Component {
     state = {
         votacao: null,
 
-        loading: false,
+        perguntas: [],
+        loading: true,
         error: null,
         votacaoOk: false
     }
 
     componentDidMount() {
-        try {
-            const { state } = this.props.location;
-            if (state) {
-                if (state.votacao)
-                    this.setState({ votacao: state.votacao });
-            } else {
-                const { match } = this.props;
-                axios.get(`${api}votacao/${match.params.id}`)
-                    .then(r => {
-                        r = r.data;
-                        if (r) {
-                            this.setState({ votacao: r });
-                        } else {
-                            this.props.history.replace('/acessar')
-                        }
-                    });
-
+        const { state } = this.props.location;
+        debugger;
+        if (state) {
+            if (state.votacao) {
+                this.setState({ votacao: state.votacao });
+                return this.getPerguntas(state.votacao._id);
             }
-        } catch (ex) {
-            this.props.history.replace('/acessar')
-
         }
+
+        this.props.history.replace('/acessar')
+    }
+
+    getPerguntas(votacaoId) {
+
+        this.setState({ loading: true });
+        axios.get(`${api}votacao/${votacaoId}/perguntas`)
+            .then(r => {
+                this.setState({ perguntas: r, loading: false })
+            })
     }
 
     votar(conceito) {
-        const { votacao, loading } = this.state;
+        const { votacao, loading, rating } = this.state;
         if (loading) return;
         this.setState({ loading: true });
-        axios.post(`${api}votacao/${votacao._id}/votar`, { votacaoId: votacao._id, conceito: conceito })
+        axios.post(`${api}votacao/${votacao._id}/votar`, { votacaoId: votacao._id, valor: rating })
             .then(r => {
                 r = r.data;
                 if (r.r) {
@@ -59,49 +51,52 @@ class Votacao extends React.Component {
             })
     }
 
-    render() {
-        const { votacao, loading, votacaoOk } = this.state;
+    handleRate(e, { rating, maxRating }) {
+        this.setState({ rating });
+    }
+
+    renderVotoComputado() {
         return (
             <div>
-                {votacao ?
-                    <Container>
-                        <h1 className='text-center'>Votação {votacao.nome}</h1>
-                        <small>{votacao.votos.length} votos.</small>
-                        {votacaoOk ?
-                            <div>
-                                <h1 className='text-center'>Seu voto foi computado!</h1>
+                <h1>Voto computado</h1>
+            </div>
+        )
+    }
 
-                                <Link to='/'>
-                                    <Button>Ok</Button>
-                                </Link>
-                            </div>
-                            :
-                            loading ?
-                                <Loader active={true} content='Buscando votacoes' />
+    render() {
+        const { loading, votacaoOk, votacao } = this.state;
+        if (votacao == null) return <Loader active={true} />;
+        return (
+            <div>
+                <div className='votacaoHeader'>
+                    <div>
+                        <Link to='/'>
+                            <Button>Voltar</Button>
+                        </Link>
+                    </div>
+
+                    <h1>{votacao.titulo}</h1>
+
+                    <p>{votacao.descricao}</p>
+                </div>
+                {
+                    loading ?
+                        <Loader active={true} />
+                        :
+                        (
+                            votacaoOk ?
+                                this.renderVotoComputado()
                                 :
-                                <div>
-                                    <div className='conceitos'>
-                                        <div className='conceito' onClick={() => this.votar(conceitos.massa)} disabled={loading}>Massa</div>
-                                        <div className='conceito' onClick={() => this.votar(conceitos.legal)} disabled={loading}>Legal</div>
-
-                                        <div className='conceito' onClick={() => this.votar(conceitos.tentandoEntender)} disabled={loading}>Tentando entender</div>
-                                        <div className='conceito' onClick={() => this.votar(conceitos.puts)} disabled={loading}>Puts</div>
-                                    </div>
-
+                                <Container>
                                     <div>
-                                        <Link to='/'>
-                                            <Button>Início</Button>
-                                        </Link>
+                                        <Rating maxRating={5} defaultRating={3} icon='star' size='massive' onRate={this.handleRate} />
                                     </div>
-                                </div>
+                                </Container>
+                        )
 
-                        }
-
-
-                    </Container>
-                    :
-                    <Loader active={true} content='Buscando votação...' />
                 }
+
+
             </div>
         )
     }

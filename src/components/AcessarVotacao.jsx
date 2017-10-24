@@ -41,35 +41,36 @@ class AcessarVotacao extends React.Component {
 
                 }
             });
-
     }
+
+    goToVotacao(votacao) {
+        const { push } = this.props.history;
+        debugger
+        push(`/votacao/${votacao._id}`, { votacao });
+    }
+
     render() {
         const { buscado, encontrado, codigo, votacoes } = this.state;
 
         return (
             <div>
-                <h1>Acessar Votacao</h1>
+                {/* <h1>Acessar Votacao</h1> */}
 
 
                 <Container>
                     {buscado && !encontrado ?
                         <h4>Votação não encontrada</h4> : null
                     }
-                    <Form onSubmit={this.submitForm.bind(this)}>
+                    {/* <Form onSubmit={this.submitForm.bind(this)}>
                         <Form.Field>
                             <label>Código da votacao</label>
                             <input placeholder='Código' value={codigo} onChange={({ target: { value } }) => this.setState({ codigo: value })} required />
                         </Form.Field>
-                        {/* <Form.Field>
-                            <label>Senha de ADM</label>
-                            <input placeholder='Senha' value={senha} onChange={({ target: { value } }) => this.setState({ senha: value })} required />
-                        </Form.Field> */}
-
                         <Button type='submit'>Acessar</Button>
                         <Link to='/'>
                             <Button>Voltar</Button>
                         </Link>
-                    </Form>
+                    </Form> */}
 
                     <h2>Votações</h2>
 
@@ -86,7 +87,7 @@ class AcessarVotacao extends React.Component {
                                             <List.Content>
                                                 <List.Header>{votacao.titulo}</List.Header>
                                                 <p>{votacao.descricao}</p>
-                                                <Link to={`/votacao/${votacao._id}`}>Acessar</Link>
+                                                <Button onClick={() => this.goToVotacao(votacao)}>Acessar</Button>
                                             </List.Content>
                                         </List.Item>
                                     ))}

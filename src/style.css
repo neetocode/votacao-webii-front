@@ -31,3 +31,10 @@ body {
 .conceito:hover{
   background-color:#6fa8f9;
 }
+.votacaoHeader{
+  padding: 20px 40px;
+  background-color: teal;
+}
+.votacaoHeader h1{
+  color: white;
+}
